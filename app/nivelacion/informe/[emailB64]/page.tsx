@@ -92,9 +92,12 @@ export default async function InformeDocentePage({
   const pondD = pondFromPct(pD, WEIGHTS.DIRECTIVO);
   const pondP = pondFromPct(pP, WEIGHTS.PAR);
 
-  const pondTotal = round2(
-    [pondH, pondA, pondD, pondP].reduce((acc, v) => acc + (v ?? 0), 0)
+  // ✅ FIX TS: tipar reduce para que acc sea number
+  const pondTotalRaw = [pondH, pondA, pondD, pondP].reduce<number>(
+    (acc, v) => acc + (v ?? 0),
+    0
   );
+  const pondTotal = round2(pondTotalRaw);
 
   // Promedio simple de los componentes existentes (1..4)
   const scoresPresent = [sH, sA, sD, sP].filter(
