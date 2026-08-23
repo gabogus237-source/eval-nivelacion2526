@@ -92,12 +92,9 @@ export default async function InformeDocentePage({
   const pondD = pondFromPct(pD, WEIGHTS.DIRECTIVO);
   const pondP = pondFromPct(pP, WEIGHTS.PAR);
 
-  // ✅ FIX TS: tipar reduce para que acc sea number
-  const pondTotalRaw = [pondH, pondA, pondD, pondP].reduce<number>(
-    (acc, v) => acc + (v ?? 0),
-    0
+  const pondTotal = round2(
+    [pondH, pondA, pondD, pondP].reduce((acc, v) => acc + (v ?? 0), 0)
   );
-  const pondTotal = round2(pondTotalRaw);
 
   // Promedio simple de los componentes existentes (1..4)
   const scoresPresent = [sH, sA, sD, sP].filter(
@@ -111,7 +108,7 @@ export default async function InformeDocentePage({
   const escala = escalaFromPondTotal(pondTotal);
 
   // Ajusta periodo si quieres
-  const periodo = "2S-2025-2026";
+  const periodo = "1S-2026-2026";
   const evaluatedName = row.evaluated_name || evaluatedEmail;
 
   return (
