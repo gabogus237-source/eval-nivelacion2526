@@ -11,9 +11,6 @@ const OPTIONS = [
   { label: "N (Nunca)", value: 1 },
 ];
 
-// ✅ Macro-rol permitido por el CHECK constraint evaluations_target_role_check
-const TARGET_ROLE = "COORDINADOR";
-
 function b64urlDecode(input: string) {
   const b64 =
     input.replace(/-/g, "+").replace(/_/g, "/") +
@@ -21,7 +18,7 @@ function b64urlDecode(input: string) {
   return Buffer.from(b64, "base64").toString("utf8");
 }
 
-export default async function NivelacionParCoordEvaluatePage({
+export default async function NivelacionParDocenteEvaluatePage({
   params,
 }: {
   params: { emailB64: string };
@@ -30,7 +27,7 @@ export default async function NivelacionParCoordEvaluatePage({
     .trim()
     .toLowerCase();
 
-  if (!evaluatedEmail.includes("@")) redirect("/nivelacion/evaluar-coordinadores");
+  if (!evaluatedEmail.includes("@")) redirect("/nivelacion/evaluar-docentes");
 
   const supabase = createSupabaseServerClient();
   const { data: auth } = await supabase.auth.getUser();
@@ -48,7 +45,6 @@ export default async function NivelacionParCoordEvaluatePage({
   const myEmail = (auth.user.email || profile.email || "").trim().toLowerCase();
   if (!myEmail) throw new Error("No se pudo leer tu correo.");
 
-  // Datos del evaluado (nombre)
   const { data: docente, error: dErr } = await supabase
     .from("docente_directory")
     .select("email, full_name")
@@ -56,10 +52,10 @@ export default async function NivelacionParCoordEvaluatePage({
     .maybeSingle();
 
   if (dErr) throw new Error(dErr.message);
+  if (!docente) redirect("/nivelacion/evaluar-docentes");
 
-  const evaluatedName = (docente?.full_name || "").trim() || null;
+  const evaluatedName = (docente.full_name || "").trim() || null;
 
-  // Preguntas PAR
   const { data: questions, error: qErr } = await supabase
     .from("questions")
     .select("id, item, dimension, question")
@@ -68,13 +64,11 @@ export default async function NivelacionParCoordEvaluatePage({
 
   if (qErr) throw new Error("Error cargando preguntas PAR: " + qErr.message);
 
-  // ✅ ¿Ya evaluó este PAR?
-  // OJO: target_role debe ser 'COORDINADOR' para cumplir el CHECK
   const { data: existing } = await supabase
     .from("evaluations")
     .select("id")
     .eq("component", "PAR")
-    .eq("target_role", TARGET_ROLE)
+    .eq("target_role", "DOCENTE")
     .eq("evaluator_email", myEmail)
     .eq("evaluated_email", evaluatedEmail)
     .maybeSingle();
@@ -97,26 +91,22 @@ export default async function NivelacionParCoordEvaluatePage({
     const email = (auth2.user.email || me.email || "").trim().toLowerCase();
     if (!email) throw new Error("No se pudo leer tu correo.");
 
-    // ✅ Pre-check correcto
     const { data: ex2 } = await supabase
       .from("evaluations")
       .select("id")
       .eq("component", "PAR")
-      .eq("target_role", TARGET_ROLE)
+      .eq("target_role", "DOCENTE")
       .eq("evaluator_email", email)
       .eq("evaluated_email", evaluatedEmail)
       .maybeSingle();
 
-    if (ex2?.id) redirect("/nivelacion/evaluar-coordinadores");
-
-    // Nombre del evaluado (re-consulta opcional; aquí reusamos evaluatedName del scope)
-    // Si prefieres reconsultar aquí, también vale.
+    if (ex2?.id) redirect("/nivelacion/evaluar-docentes");
 
     const { data: ev, error: evErr } = await supabase
       .from("evaluations")
       .insert({
         component: "PAR",
-        target_role: TARGET_ROLE, // ✅ clave del arreglo
+        target_role: "DOCENTE",
         evaluator_id: auth2.user.id,
         evaluated_id: null,
         course_code: null,
@@ -129,7 +119,7 @@ export default async function NivelacionParCoordEvaluatePage({
 
     if (evErr) {
       if (String(evErr.message).includes("evaluations_unique_email"))
-        redirect("/nivelacion/evaluar-coordinadores");
+        redirect("/nivelacion/evaluar-docentes");
       throw new Error(evErr.message);
     }
 
@@ -143,16 +133,16 @@ export default async function NivelacionParCoordEvaluatePage({
     const { error: itErr } = await supabase.from("evaluation_items").insert(items);
     if (itErr) throw new Error(itErr.message);
 
-    redirect("/nivelacion/evaluar-coordinadores");
+    redirect("/nivelacion/evaluar-docentes");
   }
 
   return (
     <div>
       <p>
-        <Link href="/nivelacion/evaluar-coordinadores">← Volver</Link>
+        <Link href="/nivelacion/evaluar-docentes">← Volver</Link>
       </p>
 
-      <h1>Evaluación PAR (Coordinación de Nivelación)</h1>
+      <h1>Evaluación PAR ACADÉMICO</h1>
       <p>
         Evaluado: <b>{evaluatedName || evaluatedEmail}</b>
         <br />
@@ -160,7 +150,7 @@ export default async function NivelacionParCoordEvaluatePage({
       </p>
 
       {existing?.id ? (
-        <p style={{ color: "green" }}>✅ Ya registraste PAR para este coordinador.</p>
+        <p style={{ color: "green" }}>✅ Ya registraste PAR para este docente.</p>
       ) : (
         <form action={submit}>
           {(questions || []).map((q: any) => (
@@ -197,7 +187,7 @@ export default async function NivelacionParCoordEvaluatePage({
           ))}
 
           <button style={{ padding: 10 }} type="submit">
-            Enviar PAR
+            Enviar PAR ACADÉMICO
           </button>
         </form>
       )}
