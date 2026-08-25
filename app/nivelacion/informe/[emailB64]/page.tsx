@@ -51,7 +51,7 @@ export default async function InformeDocentePage({
     .trim()
     .toLowerCase();
 
-  if (!evaluatedEmail.includes("@")) redirect("/nivelacion/reportes");
+  if (!evaluatedEmail.includes("@")) redirect("");
 
   const supabase = createSupabaseServerClient();
   const { data: auth } = await supabase.auth.getUser();
@@ -143,7 +143,7 @@ export default async function InformeDocentePage({
 
       {/* Botones (no imprimibles) */}
       <div className="no-print" style={{ marginBottom: 12 }}>
-        <Link href="/nivelacion/reportes">← Volver</Link>
+        <Link href="">← Volver</Link>
         <PrintButton />
       </div>
 
