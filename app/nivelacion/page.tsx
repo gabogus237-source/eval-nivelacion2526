@@ -27,6 +27,11 @@ export default async function NivelacionDashboard() {
             Evaluar docentes (Directivo 20% y Par Académico 30%)
           </Link>
         </li>
+        <li>
+          <Link href="/nivelacion/informe/reportes">
+            Ver informes de evaluación docente
+          </Link>
+        </li>
       </ul>
     </div>
   );
