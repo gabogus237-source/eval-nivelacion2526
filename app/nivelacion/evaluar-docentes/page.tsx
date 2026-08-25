@@ -42,7 +42,7 @@ export default async function NivelacionEvaluarDocentesPage() {
       <p>
         <Link href="/nivelacion">← Volver</Link>
       </p>
-      <h1>Directivo · Evaluar docentes</h1>
+      <h1>Evaluar docentes · Directivo y Par Académico</h1>
 
       <div style={{ marginTop: 12 }}>
         {(docentes || []).map((d: any) => {
@@ -66,6 +66,10 @@ export default async function NivelacionEvaluarDocentesPage() {
               <div style={{ marginTop: 8 }}>
                 <Link href={`/nivelacion/directivo/${token}`}>
                   Evaluar DIRECTIVO
+                </Link>
+                {" · "}
+                <Link href={`/nivelacion/par-coordinador/${token}`}>
+                  Evaluar PAR ACADÉMICO
                 </Link>
               </div>
             </div>
