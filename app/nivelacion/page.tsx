@@ -22,8 +22,11 @@ export default async function NivelacionDashboard() {
       <p>Usuario: <b>{profile.email || data.user.email}</b></p>
 
       <ul>
-        <li><Link href="/nivelacion/evaluar-docentes">Evaluar docentes (Directivo 20%)</Link></li>
-        <li><Link href="/nivelacion/evaluar-coordinadores">Evaluar coordinadores (Par Académico 30%)</Link></li>
+        <li>
+          <Link href="/nivelacion/evaluar-docentes">
+            Evaluar docentes (Directivo 20% y Par Académico 30%)
+          </Link>
+        </li>
       </ul>
     </div>
   );
