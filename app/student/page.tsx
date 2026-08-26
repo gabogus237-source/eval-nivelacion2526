@@ -85,9 +85,6 @@ export default async function StudentDashboard() {
         })}
       </ul>
 
-      <p style={{ marginTop: 18 }}>
-        ¿Elegiste mal tu curso? <Link href="/select-course">Cambiar curso</Link>
-      </p>
     </div>
   );
 }
